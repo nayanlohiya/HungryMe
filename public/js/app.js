@@ -14,7 +14,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var noty__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(noty__WEBPACK_IMPORTED_MODULE_0__);
 //this is the file of javascript for the frontend or whatever we do in frontend
 
- //this is to show the side bar
+ //this is to show the side bar and this feature is no longer supported
 
 var addToCart = document.querySelectorAll('.add-to-cart'); //including the add-to-cart class from home.ejs into this app.js
 var cartCounter = document.querySelector('#cartCounter'); //including cardCounter object from layout.ejs which is there in the navbar

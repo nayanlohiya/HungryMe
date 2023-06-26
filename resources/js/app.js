@@ -1,6 +1,6 @@
 //this is the file of javascript for the frontend or whatever we do in frontend
 import axios from 'axios' 
-import Noty from 'noty' //this is to show the side bar
+import Noty from 'noty' //this is to show the side bar and this feature is no longer supported
 
 let addToCart = document.querySelectorAll('.add-to-cart')//including the add-to-cart class from home.ejs into this app.js
 let cartCounter = document.querySelector('#cartCounter')//including cardCounter object from layout.ejs which is there in the navbar
