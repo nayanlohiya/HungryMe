@@ -7,9 +7,9 @@ const expressLayout = require('express-ejs-layouts')
 const PORT = process.env.PORT || 3300
 const mongoose = require('mongoose') //including mongoose
 const session = require('express-session')//requring session which uses cookies
-const flash = require('express-flash') //this is to store session id in the cookies and is send along with req
+const flash = require('express-flash') //this is to store session id in the cookies and is send along with req and also used to display meaasge
 const MongoDbStore = require('connect-mongo')  //used to store sesion id in the data base for the time we have mentioned in max life in the syntax
-
+const passport = require('passport')//for verification and used using login time
 
 // Database connection
 mongoose.connect(process.env.MONGO_CONNECTION_URL, { useNewUrlParser: true, useCreateIndex:true, useUnifiedTopology: true, useFindAndModify : true });
@@ -37,13 +37,20 @@ app.use(session({
     saveUninitialized: false,
     cookie: { maxAge: 1000 * 60 * 60 * 24 } // 24 hour
 }))
+//passport ka configuartion should be after the session  otherwiss it wont work
+// Passport config and using seperate file for doing everything
+const passportInit = require('./app/config/passport')
+passportInit(passport) //sending passport object to the passport.js file so that we can use there
+app.use(passport.initialize())
+app.use(passport.session())
 
 app.use(flash())//using flash
 //assets
 app.use(express.static('public')) //this is used to tell the server that we have use public as static(means data will go into public folder from resources folder) this is basically to include the css if not then css will not be included with html in home.ejs
+app.use(express.urlencoded({ extended: false }))//to recieve url encodeded data from the client when we register and click on submit button
 app.use(express.json()) //this is so that server can read json which it cannot read till this command is not given
 
-// Global middleware--- this is to allow session to be used in the frontend that is in app.js file
+// Global middleware--- this is to allow session and user from the backend to be used in the frontend that is in app.js file and layout.ejs file for the user
 app.use((req, res, next) => {
     res.locals.session = req.session
     res.locals.user = req.user
