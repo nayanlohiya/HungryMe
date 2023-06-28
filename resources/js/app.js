@@ -1,6 +1,8 @@
 //this is the file of javascript for the frontend or whatever we do in frontend
 import axios from 'axios' 
 import Noty from 'noty' //this is to show the side bar and this feature is no longer supported
+import { initAdmin } from './admin' //importing admin.js file in app.js which we created to avoid messup here otherwise the code inside admin.js would have been writtn here
+ import moment from 'moment'
 
 let addToCart = document.querySelectorAll('.add-to-cart')//including the add-to-cart class from home.ejs into this app.js
 let cartCounter = document.querySelector('#cartCounter')//including cardCounter object from layout.ejs which is there in the navbar
@@ -31,3 +33,45 @@ addToCart.forEach((btn) => {
         updateCart(pizza) //calling updateCart methood
     })
 })
+
+// Remove alert message after X seconds and this we get from orders.ejs 
+const alertMsg = document.querySelector('#success-alert')
+if(alertMsg) {
+    setTimeout(() => {
+        alertMsg.remove()
+    }, 2000)
+}
+
+initAdmin()//impoting init function from admin.js file
+
+// Change order status
+let statuses = document.querySelectorAll('.status_line')//getting all the 5 status from singleOrder page
+let hiddenInput = document.querySelector('#hiddenInput') //getting the doc of the current order_id from singleOrder from hidden input
+let order = hiddenInput ? hiddenInput.value : null
+order = JSON.parse(order) //converting string into object
+let time = document.createElement('small') //this we are creating <small>tag from html to get append in the tl tag in the singleorder page so that we can get the time
+
+function updateStatus(order) {
+    statuses.forEach((status) => {
+        status.classList.remove('step-completed')
+        status.classList.remove('current')
+    })
+    let stepCompleted = true; //making this true 
+    statuses.forEach((status) => {
+       let dataProp = status.dataset.status
+       if(stepCompleted) {
+            status.classList.add('step-completed') //adding the step-completed class to the statuses classes
+       }
+       if(dataProp === order.status) { //checking the ststus in db with the statuses we recieve fron 
+            stepCompleted = false
+            time.innerText = moment(order.updatedAt).format('hh:mm A') //updating time which have to be displayed in singleOrderPge
+            status.appendChild(time) //this we are appending time in singleOrder.ejs after the status
+           if(status.nextElementSibling) {
+            status.nextElementSibling.classList.add('current')
+           }
+       }
+    })
+
+}
+
+updateStatus(order);

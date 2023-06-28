@@ -3,6 +3,11 @@ const bcrypt = require('bcrypt')
 const passport = require('passport')
 
 function authController() {
+    //checking if the user is admin or customer
+    const _getRedirectUrl = (req) => {
+        return req.user.role === 'admin' ? '/admin/orders' : '/customer/orders'
+    }
+
     return {
          login(req, res) {
             return res.render('auth/login') 
@@ -29,7 +34,7 @@ function authController() {
                         return next(err)
                     }
 
-                    return res.redirect('/') //redirecting to oreder page
+                    return res.redirect(_getRedirectUrl(req)) //redirecting to respective  page if it is admin then to admin/order if customer then to the customer/order page
                 })
             })(req, res, next)//returning fn of .authenticate method
         },
@@ -75,8 +80,10 @@ function authController() {
          })
         },
         logout(req, res) { //craeting  the logout method
-            req.logout()
-            return res.redirect('/login')  
+            req.logout(function(err) {
+                if (err) { return next(err); }
+                return res.redirect('/login');
+              });
         }
 
     }
