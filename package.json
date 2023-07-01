@@ -8,7 +8,7 @@
     "dev": "nodemon server.js",
     "development": "mix",
     "watch": "npx mix watch",
-    "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
+    "production": "mix --production"
   },
   "author": "nayan",
   "license": "ISC",
@@ -17,6 +17,7 @@
     "bcrypt": "^5.1.0",
     "connect": "^3.7.0",
     "connect-mongo": "^4.6.0",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.3.1",
     "ejs": "^3.1.9",
     "express": "^4.18.2",

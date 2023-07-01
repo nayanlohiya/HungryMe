@@ -1,10 +1,11 @@
+//i have removed poduction script with now given production
 require('dotenv').config()  //using this so that we can use .env file in this file
 const express = require('express')
 const app = express()
 const ejs = require('ejs')
 const path = require('path')
 const expressLayout = require('express-ejs-layouts')
-const PORT = process.env.PORT || 3300
+const PORT = process.env.PORT || 3000
 const mongoose = require('mongoose') //including mongoose
 const session = require('express-session')//requring session which uses cookies
 const flash = require('express-flash') //this is to store session id in the cookies and is send along with req and also used to display meaasge
@@ -74,6 +75,9 @@ app.set('view engine', 'ejs')
 
 // we have moved all the requests to web.js so  express object->app will be required there so we have used this syntax 
 require('./routes/web')(app)
+app.use((req, res) => {//if the route does not match then it will render this page
+    res.status(404).render('errors/404')
+})
 
  const server=app.listen(PORT , () => {
             console.log(`Listening on port ${PORT}`)

@@ -86,7 +86,6 @@ if(order) {
 //this is so that when we will place the order it will auto matically show in the admin page without refresing which can be done with the help real time
 let adminAreaPath = window.location.pathname//getting the full path name
 if(adminAreaPath.includes('admin')) {
-    initAdmin(socket)
     socket.emit('join', 'adminRoom')//creting the room of join with the roomname as adminRoom and changes will be done in admin.js and also in ordercontroller
 }
 
