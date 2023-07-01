@@ -10,6 +10,7 @@ const session = require('express-session')//requring session which uses cookies
 const flash = require('express-flash') //this is to store session id in the cookies and is send along with req and also used to display meaasge
 const MongoDbStore = require('connect-mongo')  //used to store sesion id in the data base for the time we have mentioned in max life in the syntax
 const passport = require('passport')//for verification and used using login time
+const Emitter = require('events')//for real time communication used to that we can emit changes 
 
 // Database connection
 mongoose.connect(process.env.MONGO_CONNECTION_URL, { useNewUrlParser: true, useCreateIndex:true, useUnifiedTopology: true, useFindAndModify : true });
@@ -25,6 +26,11 @@ connection.once('open', () => {
 //     mongooseConnection: connection,
 //     collection: 'sessions'
 // })
+
+// Event emitter
+const eventEmitter = new Emitter() //declaring the instance of it
+app.set('eventEmitter', eventEmitter)//here we are combining emitter with exprees so that we can use it in ststuscontroller.js in admin folder 
+//first is the name which we are declaring and it should be same across all
 
 
 // Session configuration
@@ -69,6 +75,24 @@ app.set('view engine', 'ejs')
 // we have moved all the requests to web.js so  express object->app will be required there so we have used this syntax 
 require('./routes/web')(app)
 
- app.listen(PORT , () => {
+ const server=app.listen(PORT , () => {
             console.log(`Listening on port ${PORT}`)
         })
+
+// Socket
+
+const io = require('socket.io')(server)//same server which we declared above
+io.on('connection', (socket) => { //here we are making connection with the browser
+    // Join
+    socket.on('join', (orderId) => { //here we are recieving orderid from client app.js file to emit the changes there
+      socket.join(orderId)
+    })
+})
+
+eventEmitter.on('orderUpdated', (data) => { //recieving the orderUpdated name from adminfolder
+  io.to(`order_${data.id}`).emit('orderUpdated', data)//here we are emitting data that we have we have recieved from statuscontroller to the private room which we created using order_id
+})
+
+eventEmitter.on('orderPlaced', (data) => { //from the ordercontroller
+  io.to('adminRoom').emit('orderPlaced', data)
+})

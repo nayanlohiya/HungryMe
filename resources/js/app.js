@@ -42,7 +42,7 @@ if(alertMsg) {
     }, 2000)
 }
 
-initAdmin()//impoting init function from admin.js file
+
 
 // Change order status
 let statuses = document.querySelectorAll('.status_line')//getting all the 5 status from singleOrder page
@@ -53,10 +53,10 @@ let time = document.createElement('small') //this we are creating <small>tag fro
 
 function updateStatus(order) {
     statuses.forEach((status) => {
-        status.classList.remove('step-completed')
+        status.classList.remove('step-completed')//here we are removing both the prev classes and will begin from the beginning to update the real time
         status.classList.remove('current')
     })
-    let stepCompleted = true; //making this true 
+    let stepCompleted = true; //making this true    
     statuses.forEach((status) => {
        let dataProp = status.dataset.status
        if(stepCompleted) {
@@ -75,3 +75,31 @@ function updateStatus(order) {
 }
 
 updateStatus(order);
+
+// Socket
+let socket = io()
+
+// Join
+if(order) {
+    socket.emit('join', `order_${order._id}`) //here we are sending orderid so that we can create a room with this orderid for real time communication
+}
+//this is so that when we will place the order it will auto matically show in the admin page without refresing which can be done with the help real time
+let adminAreaPath = window.location.pathname//getting the full path name
+if(adminAreaPath.includes('admin')) {
+    initAdmin(socket)
+    socket.emit('join', 'adminRoom')//creting the room of join with the roomname as adminRoom and changes will be done in admin.js and also in ordercontroller
+}
+
+
+socket.on('orderUpdated', (data) => {
+    const updatedOrder = { ...order }//copying the order object here which is done by three dots followed by name
+    updatedOrder.updatedAt = moment().format()//updating the time with the current time
+    updatedOrder.status = data.status//updating the status
+    updateStatus(updatedOrder)//calling the above function to execute
+    new Noty({ //to show the notification
+        type: 'success',
+        timeout: 1000,
+        text: 'Order updated',
+        progressBar: false,
+    }).show();
+})
